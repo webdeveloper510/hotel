@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\hotel;
+use App\Models\Destination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
@@ -137,8 +138,7 @@ public function delete_hotel($id){
 }
 
 
-public function update_hotel(Request $request, $id)
-{
+public function update_hotel(Request $request, $id){
 
     $request->validate([
         'slideImg' => 'nullable|image',
@@ -178,5 +178,31 @@ public function update_hotel(Request $request, $id)
     ]);
 }
 
+    public function hotel_location(Request $request){
+
+        $request->validate([
+            'country_img' => 'required',
+            'country' => 'required',
+            'hotel' => 'required',
+        ]);
+
+        $hotel_loc = new Destination;
+
+        if ($request->hasFile('country_img')) {
+            $extension = $request->file('country_img')->getClientOriginalExtension();
+            $filename = time() . '.' . $extension;
+            $request->file('country_img')->move(public_path('country_images'), $filename);
+            $hotel_loc->country_img = $filename;
+        }
+
+        $hotel_loc->country = $request->country;
+        $hotel_loc->hotel = $request->hotel;
+        $hotel_loc->save();
+
+        return response()->json([
+            'Message' => 'Hotel Location Saved Successfully !!',
+            'Data' => $hotel_loc,
+        ]);
+    }
 
 }
