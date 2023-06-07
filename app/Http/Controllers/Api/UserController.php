@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\hotel;
-use GuzzleHttp\Psr7\Message;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
@@ -88,7 +87,7 @@ class UserController extends Controller
         'img' => 'required|file',
         'tag' => 'required',
         'title' => 'required',
-        'location_id' => 'required',
+        'location' => 'required',
         'price' => 'required',
         'delayAnimation' => 'required',
     ]);
@@ -111,7 +110,7 @@ class UserController extends Controller
 
     $hotel->tag = $request->tag;
     $hotel->title = $request->title;
-    $hotel->location_id = $request->location_id;
+    $hotel->location = $request->location;
     $hotel->price = $request->price;
     $hotel->delayAnimation = $request->delayAnimation;
     $hotel->save();
@@ -123,9 +122,9 @@ class UserController extends Controller
 }
 
 public function get_hotels(){
-    $hotes = hotel::all();
+    $hotels = hotel::all();
     return response()->json([
-        'Hotels' => $hotes,
+        'Hotels' => $hotels,
     ]);
 }
 
