@@ -85,7 +85,6 @@ class UserController extends Controller
     public function add_hotel(Request $request)
     {
         $request->validate([
-            'img' => 'required|file',
             'tag' => 'required',
             'title' => 'required',
             'location' => 'required',
@@ -217,7 +216,7 @@ public function update_hotel(Request $request, $id){
 
         return response()->json([
             'Message' => 'Hotel Location Saved Successfully !!',
-            'Data' => $hotel_loc,
+            'data' => $hotel_loc,
         ]);
     }
 
