@@ -89,12 +89,15 @@ class UserController extends Controller
 
     public function add_hotel(Request $request)
     {
+       
         $request->validate([
             'tag' => 'required',
             'title' => 'required',
             'location' => 'required',
             'price' => 'required',
             'delayAnimation' => 'required',
+            'slideImg' => 'required',
+            'img' => 'required',
         ]);
 
         $hotel = new hotel;
@@ -127,6 +130,7 @@ class UserController extends Controller
         $hotel->location = $request->location;
         $hotel->price = $request->price;
         $hotel->delayAnimation = $request->delayAnimation;
+        $hotel->description = $request->description;
         $hotel->save();
 
         return response()->json([
