@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\hotel;
+use App\Models\Room;
 use App\Models\Destination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use stripe;
+use Exception;
+use Stripe\StripeClient;
+
 class UserController extends Controller
 {
     public $successStatus = 200;
@@ -132,6 +137,7 @@ class UserController extends Controller
 
     public function get_hotels()
     {
+
         $hotels = hotel::all();
 
         // Deserialize the slideImg field for each hotel
@@ -220,5 +226,58 @@ public function update_hotel(Request $request, $id){
         ]);
     }
 
+    public function stripePost(Request $request){
+        try {
+            $stripe = new \Stripe\StripeClient([
+                'api_key' => env('STRIPE_SECRET'),
+            ]);
 
+            $token = $stripe->tokens->create([
+                'card' => [
+                    'number' => $request->number,
+                    'exp_month' => $request->exp_month,
+                    'exp_year' => $request->exp_year,
+                    'cvc' => $request->cvc,
+                ],
+            ]);
+
+            $response = $stripe->charges->create([
+                'amount' => $request->amount,
+                'currency' => 'usd',
+                'source' => $token->id,
+                'description' => $request->description,
+            ]);
+
+            return response()->json([$response->status], 201);
+
+        } catch(Exception $ex) {
+
+            return response()->json(['response' => 'Error'], 500);
+        }
+    }
+
+    public function add_room(Request $request){
+
+        $request->validate([
+            'room_name' => 'required',
+            'bed_type' => 'required',
+            'room_floor' => 'required',
+            'facility' => 'required',
+        ]);
+
+        $rooms  = new Room;
+
+        $rooms['room_name'] = $request['room_name'];
+        $rooms['bed_type'] = $request['bed_type'];
+        $rooms['room_floor'] = $request['room_floor'];
+        $rooms['facility'] = $request['facility'];
+        $rooms['hotel_id'] = $request['hotel_id'];
+        $rooms->save();
+
+        return response()->json([
+            'Message' => 'Rooms Save Successfully !!',
+            'Room' => $rooms,
+        ]);
+
+    }
 }

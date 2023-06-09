@@ -21,6 +21,10 @@ Route::get('get-hotels', [UserController::class, 'get_hotels']);
 Route::delete('delete-hotel/{id}', [UserController::class, 'delete_hotel']);
 Route::post('update-hotel/{id}', [UserController::class, 'update_hotel']);
 Route::post('hotel-location',[UserController::class,'hotel_location']);
+Route::post('add-rooms', [UserController::class, 'add_room']);
+
+
+Route::post('stripe', [UserController::class, 'stripePost']);
 
 Route::group(['middleware' => 'auth:api'], function(){
 Route::post('user-details', [UserController::class, 'userDetails']);
