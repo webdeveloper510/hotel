@@ -250,7 +250,16 @@ class UserController extends Controller
         ]);
     }
 
+    public function delete_hotel_location($id)
+    {
 
+        $delete_hotel_location = Destination::find($id);
+        $delete_hotel_location->delete();
+        return response()->json([
+            'Message' => 'Deleted Hotel Location Successfully !!',
+            'data' => $delete_hotel_location,
+        ]);
+    }
 
     public function stripePost(Request $request)
     {

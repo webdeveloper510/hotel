@@ -36,7 +36,7 @@ Route::post('hotel-location', [UserController::class, 'hotel_location']);
 
 Route::get('get-hotel-location', [UserController::class, 'get_hotel_location']);
 
-
+Route::delete('delete-hotel_location/{id}', [UserController::class, 'delete_hotel_location']);
 
 // ------------------------------------ROOM------------------------------------------------\\
 
