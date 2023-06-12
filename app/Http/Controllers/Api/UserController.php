@@ -10,6 +10,7 @@ use App\Models\Room;
 use App\Models\Destination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use DB;
 use stripe;
 use Exception;
 use Stripe\StripeClient;
@@ -143,14 +144,13 @@ class UserController extends Controller
 
     public function get_hotels()
     {
-
-        $hotels = hotel::all();
-
+        $hotels = hotel::with('rooms')->get();
+    
         // Deserialize the slideImg field for each hotel
         foreach ($hotels as $hotel) {
             $hotel->slideImg = @unserialize($hotel->slideImg) ?: [];
         }
-
+    
         return response()->json([
             'Hotels' => $hotels,
         ]);
@@ -158,6 +158,7 @@ class UserController extends Controller
 
     public function delete_hotel($id)
     {
+       
         $hotel = hotel::find($id);
         $hotel->delete();
         return response()->json([
@@ -217,7 +218,6 @@ class UserController extends Controller
             'cars' => 'required',
             'tours' => 'required',
             'activity' => 'required',
-            'description' => 'required',
         ]);
 
         $hotel_loc = new Destination;
@@ -234,7 +234,6 @@ class UserController extends Controller
         $hotel_loc->cars = $request->cars;
         $hotel_loc->tours = $request->tours;
         $hotel_loc->activity = $request->activity;
-        $hotel_loc->description = $request->description;
         $hotel_loc->save();
 
         return response()->json([
