@@ -16,18 +16,19 @@ use App\Http\Controllers\Api\UserController;
 
 Route::post('login', [UserController::class, 'login']);
 Route::post('register', [UserController::class, 'register']);
-Route::post('add-hotel',[UserController::class, 'add_hotel']);
+Route::post('add-hotel', [UserController::class, 'add_hotel']);
 Route::get('get-hotels', [UserController::class, 'get_hotels']);
 Route::delete('delete-hotel/{id}', [UserController::class, 'delete_hotel']);
 Route::post('update-hotel/{id}', [UserController::class, 'update_hotel']);
-Route::post('hotel-location',[UserController::class,'hotel_location']);
+Route::post('hotel-location', [UserController::class, 'hotel_location']);
 Route::post('add-rooms', [UserController::class, 'add_room']);
+Route::get('get-hotel-location', [UserController::class, 'get_hotel_location']);
 
 
 Route::post('stripe', [UserController::class, 'stripePost']);
 
-Route::group(['middleware' => 'auth:api'], function(){
-Route::post('user-details', [UserController::class, 'userDetails']);
-Route::get('get-users', [UserController::class, 'getUsers']);
-Route::post('user-logout', [UserController::class, 'logout']);
+Route::group(['middleware' => 'auth:api'], function () {
+  Route::post('user-details', [UserController::class, 'userDetails']);
+  Route::get('get-users', [UserController::class, 'getUsers']);
+  Route::post('user-logout', [UserController::class, 'logout']);
 });

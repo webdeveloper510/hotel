@@ -17,25 +17,25 @@ use Stripe\StripeClient;
 class UserController extends Controller
 {
     public $successStatus = 200;
- /**
+    /**
      * login api
      *
      * @return \Illuminate\Http\Response
      */
-    public function login(Request $request){
-       // print_r($request);die;
-        if(Auth::attempt(['email' => $request->email, 'password' =>$request->password])){
+    public function login(Request $request)
+    {
+        // print_r($request);die;
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
-            $success['token'] =  $user->createToken('app')-> accessToken;
+            $success['token'] =  $user->createToken('app')->accessToken;
             $success['userId'] = $user->id;
-            return response()->json(['success' => $success], $this-> successStatus);
-        }
-        else{
-            return response()->json(['error'=>'Unauthorised'], 401);
+            return response()->json(['success' => $success], $this->successStatus);
+        } else {
+            return response()->json(['error' => 'Unauthorised'], 401);
         }
     }
 
- /**
+    /**
      * Register api
      *
      * @return \Illuminate\Http\Response
@@ -49,19 +49,19 @@ class UserController extends Controller
             'c_password' => 'required|same:password',
         ]);
         if ($validator->fails()) {
-             return response()->json(['error'=>$validator->errors()], 401);
- }
+            return response()->json(['error' => $validator->errors()], 401);
+        }
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
-        $success['token'] =  $user->createToken('app')-> accessToken;
+        $success['token'] =  $user->createToken('app')->accessToken;
         $success['name'] =  $user->name;
         return response()->json([
-            'success'=>$success
-        ], $this-> successStatus);
+            'success' => $success
+        ], $this->successStatus);
     }
 
- /**
+    /**
      * details api
      *
      * @return \Illuminate\Http\Response
@@ -71,17 +71,19 @@ class UserController extends Controller
         $user = Auth::user();
         return response()->json([
             'success' => $user
-        ], $this-> successStatus);
+        ], $this->successStatus);
     }
 
-    public function getUsers(){
+    public function getUsers()
+    {
         $user = User::all();
         return response()->json([
             'users' => $user,
         ]);
     }
 
-    public function logout(){
+    public function logout()
+    {
         $user = Auth::user()->token();
         $user->revoke();
         return response()->json(['message' => 'Successfully logged out']);
@@ -150,61 +152,68 @@ class UserController extends Controller
         ]);
     }
 
-public function delete_hotel($id){
-    $hotel = hotel::find($id);
-    $hotel->delete();
-    return response()->json([
-        'Hotels' => $hotel,
-    ]);
-}
-
-
-public function update_hotel(Request $request, $id){
-
-    $request->validate([
-        'slideImg' => 'nullable|image',
-        'img' => 'nullable|image',
-        'tag' => 'required',
-        'title' => 'required',
-        'price' => 'required',
-        'delayAnimation' => 'required',
-    ]);
-
-    $data = array(
-        'tag' => $request->tag,
-        'title' => $request->title,
-        'price' => $request->price,
-        'delayAnimation' => $request->delayAnimation,
-    );
-
-    if ($request->hasFile('slideImg')) {
-        $file = $request->file('slideImg');
-        $slideImg = time() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('images'), $slideImg);
-        $data['slideImg'] = $slideImg;
+    public function delete_hotel($id)
+    {
+        $hotel = hotel::find($id);
+        $hotel->delete();
+        return response()->json([
+            'Hotels' => $hotel,
+        ]);
     }
 
-    if ($request->hasFile('img')) {
-        $file = $request->file('img');
-        $img = time() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('images'), $img);
-        $data['img'] = $img;
+
+    public function update_hotel(Request $request, $id)
+    {
+
+        $request->validate([
+            'slideImg' => 'nullable|image',
+            'img' => 'nullable|image',
+            'tag' => 'required',
+            'title' => 'required',
+            'price' => 'required',
+            'delayAnimation' => 'required',
+        ]);
+
+        $data = array(
+            'tag' => $request->tag,
+            'title' => $request->title,
+            'price' => $request->price,
+            'delayAnimation' => $request->delayAnimation,
+        );
+
+        if ($request->hasFile('slideImg')) {
+            $file = $request->file('slideImg');
+            $slideImg = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images'), $slideImg);
+            $data['slideImg'] = $slideImg;
+        }
+
+        if ($request->hasFile('img')) {
+            $file = $request->file('img');
+            $img = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images'), $img);
+            $data['img'] = $img;
+        }
+
+        $updatedRows = hotel::where('id', $id)->update($data);
+
+        return response()->json([
+            'Message' => 'Hotel data updated Successfully',
+            'Updated Rows' => $updatedRows,
+        ]);
     }
 
-    $updatedRows = hotel::where('id', $id)->update($data);
-
-    return response()->json([
-        'Message' => 'Hotel data updated Successfully',
-        'Updated Rows' => $updatedRows,
-    ]);
-}
-
-    public function hotel_location(Request $request){
+    public function hotel_location(Request $request)
+    {
 
         $request->validate([
             'country_img' => 'required',
             'country' => 'required',
             'hotel' => 'required',
+            'cars' => 'required',
+            'tours' => 'required',
+            'activity' => 'required',
+            'description' => 'required',
         ]);
 
         $hotel_loc = new Destination;
@@ -218,6 +227,10 @@ public function update_hotel(Request $request, $id){
 
         $hotel_loc->country = $request->country;
         $hotel_loc->hotel = $request->hotel;
+        $hotel_loc->cars = $request->cars;
+        $hotel_loc->tours = $request->tours;
+        $hotel_loc->activity = $request->activity;
+        $hotel_loc->description = $request->description;
         $hotel_loc->save();
 
         return response()->json([
@@ -226,7 +239,17 @@ public function update_hotel(Request $request, $id){
         ]);
     }
 
-    public function stripePost(Request $request){
+    public function get_hotel_location()
+    {
+        $hotel_loc = Destination::all();
+
+        return response()->json([
+            'data' => $hotel_loc,
+        ]);
+    }
+
+    public function stripePost(Request $request)
+    {
         try {
             $stripe = new \Stripe\StripeClient([
                 'api_key' => env('STRIPE_SECRET'),
@@ -249,14 +272,14 @@ public function update_hotel(Request $request, $id){
             ]);
 
             return response()->json([$response->status], 201);
-
-        } catch(Exception $ex) {
+        } catch (Exception $ex) {
 
             return response()->json(['response' => 'Error'], 500);
         }
     }
 
-    public function add_room(Request $request){
+    public function add_room(Request $request)
+    {
 
         $request->validate([
             'room_name' => 'required',
@@ -278,6 +301,5 @@ public function update_hotel(Request $request, $id){
             'Message' => 'Rooms Save Successfully !!',
             'Room' => $rooms,
         ]);
-
     }
 }
