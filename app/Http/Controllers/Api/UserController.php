@@ -230,6 +230,15 @@ public function update_hotel(Request $request, $id){
         ]);
     }
 
+    public function get_hotel_location()
+    {
+        $hotel_loc = Destination::all();
+
+        return response()->json([
+            'data' => $hotel_loc,
+        ]);
+    }
+
     public function stripePost(Request $request){
         try {
             $stripe = new \Stripe\StripeClient([
@@ -283,5 +292,38 @@ public function update_hotel(Request $request, $id){
             'Room' => $rooms,
         ]);
 
+    }
+
+    public function get_rooms(){
+        $room = Room::all();
+        return response()->json([
+            'All Rooms' => $room,
+        ]);
+
+    }
+
+    public function update_rooms(Request $request, $id){
+
+        $data = array(
+            'room_name' => $request->room_name,
+            'bed_type' => $request->bed_type,
+            'room_floor' => $request->room_floor,
+            'facility' => $request->facility,
+        );
+    
+        $updatedRooms = Room::where('id', $id)->update($data);
+    
+        return response()->json([
+            'Message' => 'Rooms Updated Successfully !!',
+            'Updated Rooms' => $updatedRooms,
+        ]);
+    }
+
+    public function delete_rooms($id){
+        $rooms = Room::find($id);
+        $rooms->delete();
+        return response()->json([
+            'Hotels' => $rooms,
+        ]);
     }
 }

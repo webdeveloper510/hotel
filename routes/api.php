@@ -22,7 +22,10 @@ Route::delete('delete-hotel/{id}', [UserController::class, 'delete_hotel']);
 Route::post('update-hotel/{id}', [UserController::class, 'update_hotel']);
 Route::post('hotel-location',[UserController::class,'hotel_location']);
 Route::post('add-rooms', [UserController::class, 'add_room']);
-
+Route::post('get-rooms', [UserController::class, 'get_rooms']);
+Route::post('update-rooms/{id}', [UserController::class, 'update_rooms']);
+Route::post('delete-rooms/{id}', [UserController::class, 'delete_rooms']);
+Route::get('get-hotel-location', [UserController::class, 'get_hotel_location']);
 
 Route::post('stripe', [UserController::class, 'stripePost']);
 
