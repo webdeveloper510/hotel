@@ -10,6 +10,7 @@ use App\Models\Room;
 use App\Models\Destination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use DB;
 use stripe;
 use Exception;
 use Stripe\StripeClient;
@@ -143,7 +144,6 @@ class UserController extends Controller
 
     public function get_hotels()
     {
-
         $hotels = hotel::all();
 
         // Deserialize the slideImg field for each hotel
@@ -158,6 +158,8 @@ class UserController extends Controller
 
     public function delete_hotel($id)
     {
+        // echo $id;
+        // die;
         $hotel = hotel::find($id);
         $hotel->delete();
         return response()->json([
@@ -202,14 +204,13 @@ class UserController extends Controller
         $updatedRows = hotel::where('id', $id)->update($data);
 
         return response()->json([
-            'Message' => 'Hotel data updated Successfully',
+            'Message' => 'Hotel data updated Successfully !!',
             'Updated Rows' => $updatedRows,
         ]);
     }
 
     public function hotel_location(Request $request)
     {
-
         $request->validate([
             'country_img' => 'required',
             'country' => 'required',
@@ -217,7 +218,6 @@ class UserController extends Controller
             'cars' => 'required',
             'tours' => 'required',
             'activity' => 'required',
-            'description' => 'required',
         ]);
 
         $hotel_loc = new Destination;
@@ -234,7 +234,6 @@ class UserController extends Controller
         $hotel_loc->cars = $request->cars;
         $hotel_loc->tours = $request->tours;
         $hotel_loc->activity = $request->activity;
-        $hotel_loc->description = $request->description;
         $hotel_loc->save();
 
         return response()->json([
@@ -251,6 +250,8 @@ class UserController extends Controller
             'data' => $hotel_loc,
         ]);
     }
+
+
 
     public function stripePost(Request $request)
     {
@@ -284,7 +285,6 @@ class UserController extends Controller
 
     public function add_room(Request $request)
     {
-
         $request->validate([
             'room_name' => 'required',
             'bed_type' => 'required',
