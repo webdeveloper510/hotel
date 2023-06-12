@@ -144,7 +144,7 @@ class UserController extends Controller
 
     public function get_hotels()
     {
-        $hotels = hotel::all();
+        $hotels = hotel::with('rooms')->get();
 
         // Deserialize the slideImg field for each hotel
         foreach ($hotels as $hotel) {
@@ -158,8 +158,7 @@ class UserController extends Controller
 
     public function delete_hotel($id)
     {
-        // echo $id;
-        // die;
+
         $hotel = hotel::find($id);
         $hotel->delete();
         return response()->json([
