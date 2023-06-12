@@ -91,12 +91,15 @@ class UserController extends Controller
 
     public function add_hotel(Request $request)
     {
+
         $request->validate([
             'tag' => 'required',
             'title' => 'required',
             'location' => 'required',
             'price' => 'required',
             'delayAnimation' => 'required',
+            'slideImg' => 'required',
+            'img' => 'required',
         ]);
 
         $hotel = new hotel;
@@ -129,6 +132,7 @@ class UserController extends Controller
         $hotel->location = $request->location;
         $hotel->price = $request->price;
         $hotel->delayAnimation = $request->delayAnimation;
+        $hotel->description = $request->description;
         $hotel->save();
 
         return response()->json([
@@ -300,6 +304,41 @@ class UserController extends Controller
         return response()->json([
             'Message' => 'Rooms Save Successfully !!',
             'Room' => $rooms,
+        ]);
+    }
+
+    public function get_rooms()
+    {
+        $room = Room::all();
+        return response()->json([
+            'All Rooms' => $room,
+        ]);
+    }
+
+    public function update_rooms(Request $request, $id)
+    {
+
+        $data = array(
+            'room_name' => $request->room_name,
+            'bed_type' => $request->bed_type,
+            'room_floor' => $request->room_floor,
+            'facility' => $request->facility,
+        );
+
+        $updatedRooms = Room::where('id', $id)->update($data);
+
+        return response()->json([
+            'Message' => 'Rooms Updated Successfully !!',
+            'Updated Rooms' => $updatedRooms,
+        ]);
+    }
+
+    public function delete_rooms($id)
+    {
+        $rooms = Room::find($id);
+        $rooms->delete();
+        return response()->json([
+            'Hotels' => $rooms,
         ]);
     }
 }
