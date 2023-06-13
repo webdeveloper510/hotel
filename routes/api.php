@@ -38,7 +38,7 @@ Route::get('get-hotel-location', [UserController::class, 'get_hotel_location']);
 
 Route::delete('delete-hotel_location/{id}', [UserController::class, 'delete_hotel_location']);
 
-// ------------------------------------ROOM------------------------------------------------\\
+// ------------------------------------ROOMS------------------------------------------------\\
 
 Route::post('add-rooms', [UserController::class, 'add_room']);
 
@@ -48,11 +48,10 @@ Route::post('update-rooms/{id}', [UserController::class, 'update_rooms']);
 
 Route::post('delete-rooms/{id}', [UserController::class, 'delete_rooms']);
 
-// ------------------------------------STRIPE-----------------------------------------------\\
 
 Route::post('stripe', [UserController::class, 'stripePost']);
 
-// ------------------------------------MIDDLEWARE--------------------------------------------\\
+Route::get('search', [UserController::class, 'search_hotels']);
 
 Route::group(['middleware' => 'auth:api'], function () {
 
@@ -61,4 +60,6 @@ Route::group(['middleware' => 'auth:api'], function () {
   Route::get('get-users', [UserController::class, 'getUsers']);
 
   Route::post('user-logout', [UserController::class, 'logout']);
+  
+  Route::post('book-hotel', [UserController::class, 'book_hotel']);
 });

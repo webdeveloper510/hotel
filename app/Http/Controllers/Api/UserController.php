@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\hotel;
 use App\Models\Room;
 use App\Models\Destination;
+use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use DB;
@@ -350,4 +351,57 @@ class UserController extends Controller
             'Hotels' => $rooms,
         ]);
     }
+
+    public function search_hotels(Request $request)
+    {
+
+        $search = $request->input('search'); // Get the search keyword from the request
+
+        $hotels = hotel::with('rooms')
+            ->where(function ($query) use ($search) {
+                $query->where('title', 'LIKE', "%$search%")
+                    ->orWhere('location', 'LIKE', "%$search%");
+            })
+            ->get();
+
+        // Deserialize the slideImg field for each hotel
+        foreach ($hotels as $hotel) {
+            $hotel->slideImg = @unserialize($hotel->slideImg) ?: [];
+        }
+
+        return response()->json([
+            'hotels' => $hotels,
+        ]);
+    }
+
+    public function book_hotel(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required',
+            'phone' => 'required',
+            'first_address' => 'required',
+            'state' => 'required',
+            'zip_code' => 'required',
+            'special_requests' => 'required',
+        ]);
+
+        $book_hotel = new Booking;
+
+        $book_hotel['user_id'] = Auth::user()->id;
+        $book_hotel['name'] = $request->name;
+        $book_hotel['email'] = $request->email;
+        $book_hotel['phone'] = $request->phone;
+        $book_hotel['first_address'] = $request->first_address;
+        $book_hotel['second_address'] = $request->second_address;
+        $book_hotel['state'] = $request->state;
+        $book_hotel['zip_code'] = $request->zip_code;
+        $book_hotel['special_requests'] = $request->special_requests;
+        $book_hotel->save();
+
+        return response()->json([
+            'user_data' => $book_hotel
+        ]);
+    }
+
 }
