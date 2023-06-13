@@ -146,12 +146,12 @@ class UserController extends Controller
     public function get_hotels()
     {
         $hotels = hotel::with('rooms')->get();
-    
+
         // Deserialize the slideImg field for each hotel
         foreach ($hotels as $hotel) {
             $hotel->slideImg = @unserialize($hotel->slideImg) ?: [];
         }
-    
+
         return response()->json([
             'Hotels' => $hotels,
         ]);
@@ -159,7 +159,7 @@ class UserController extends Controller
 
     public function delete_hotel($id)
     {
-       
+
         $hotel = hotel::find($id);
         $hotel->delete();
         return response()->json([
@@ -204,14 +204,13 @@ class UserController extends Controller
         $updatedRows = hotel::where('id', $id)->update($data);
 
         return response()->json([
-            'Message' => 'Hotel data updated Successfully',
+            'Message' => 'Hotel data updated Successfully !!',
             'Updated Rows' => $updatedRows,
         ]);
     }
 
     public function hotel_location(Request $request)
     {
-
         $request->validate([
             'country_img' => 'required',
             'country' => 'required',
@@ -252,6 +251,16 @@ class UserController extends Controller
         ]);
     }
 
+    public function delete_hotel_location($id)
+    {
+        $delete_hotel_location = Destination::find($id);
+        $delete_hotel_location->delete();
+        return response()->json([
+            'Message' => 'Deleted Hotel Location Successfully !!',
+            'data' => $delete_hotel_location,
+        ]);
+    }
+
     public function stripePost(Request $request)
     {
         try {
@@ -284,7 +293,6 @@ class UserController extends Controller
 
     public function add_room(Request $request)
     {
-
         $request->validate([
             'room_name' => 'required',
             'bed_type' => 'required',
