@@ -53,6 +53,8 @@ Route::post('stripe', [UserController::class, 'stripePost']);
 
 Route::get('search', [UserController::class, 'search_hotels']);
 
+// -----------------------------------Middeleware------------------------------------------\\
+
 Route::group(['middleware' => 'auth:api'], function () {
 
   Route::post('user-details', [UserController::class, 'userDetails']);
@@ -60,6 +62,6 @@ Route::group(['middleware' => 'auth:api'], function () {
   Route::get('get-users', [UserController::class, 'getUsers']);
 
   Route::post('user-logout', [UserController::class, 'logout']);
-  
+
   Route::post('book-hotel', [UserController::class, 'book_hotel']);
 });
