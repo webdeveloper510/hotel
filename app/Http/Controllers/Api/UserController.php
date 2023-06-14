@@ -267,7 +267,9 @@ class UserController extends Controller
             $stripe = new \Stripe\StripeClient([
                 'api_key' => env('STRIPE_SECRET'),
             ]);
-
+            echo "<pre>";
+            print_r($stripe);
+            die;
             $token = $stripe->tokens->create([
                 'card' => [
                     'number' => $request->number,
