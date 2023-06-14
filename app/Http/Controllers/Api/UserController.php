@@ -319,7 +319,7 @@ class UserController extends Controller
     {
         $room = Room::all();
         return response()->json([
-            'All Rooms' => $room,
+            'AllRooms' => $room,
         ]);
     }
 

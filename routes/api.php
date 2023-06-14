@@ -42,7 +42,7 @@ Route::delete('delete-hotel_location/{id}', [UserController::class, 'delete_hote
 
 Route::post('add-rooms', [UserController::class, 'add_room']);
 
-Route::post('get-rooms', [UserController::class, 'get_rooms']);
+Route::get('get-rooms', [UserController::class, 'get_rooms']);
 
 Route::post('update-rooms/{id}', [UserController::class, 'update_rooms']);
 
