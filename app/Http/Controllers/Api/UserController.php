@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\hotel;
+use App\Models\Hotel;
 use App\Models\Room;
 use App\Models\Destination;
 use App\Models\Booking;
+use App\Models\Facility;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use DB;
@@ -100,8 +101,9 @@ class UserController extends Controller
             'location' => 'required',
             'price' => 'required',
             'delayAnimation' => 'required',
-            'slideImg' => 'required',
-            'img' => 'required',
+            'slideImg' => 'nullable',
+            'slideImg.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'img' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         $hotel = new hotel;
@@ -143,24 +145,37 @@ class UserController extends Controller
         ]);
     }
 
-    public function get_hotels()
+    public function getHotels()
     {
-        $hotels = hotel::with('rooms')->get();
+        $facilityIds = [1, 2, 3]; // Example array of facility_id values
+
+        $hotels = DB::table('hotels')
+            ->leftJoin('rooms', 'hotels.id', '=', 'rooms.hotel_id')
+            ->leftJoin('facilities', function ($join) use ($facilityIds) {
+                $join->on('rooms.facility_id', '=', 'facilities.id')
+                    ->whereIn('facilities.id', $facilityIds);
+            })
+            ->select('hotels.*', 'rooms.*', 'facilities.*')
+            ->get();
 
         // Deserialize the slideImg field for each hotel
-        foreach ($hotels as $hotel) {
+        $hotels->each(function ($hotel) {
             $hotel->slideImg = @unserialize($hotel->slideImg) ?: [];
-        }
+        });
 
         return response()->json([
             'Hotels' => $hotels,
         ]);
     }
 
+
+
+
+
     public function delete_hotel($id)
     {
 
-        $hotel = hotel::find($id);
+        $hotel = Hotel::find($id);
         $hotel->delete();
         return response()->json([
             'Hotels' => $hotel,
@@ -201,7 +216,7 @@ class UserController extends Controller
             $data['img'] = $img;
         }
 
-        $updatedRows = hotel::where('id', $id)->update($data);
+        $updatedRows = Hotel::where('id', $id)->update($data);
 
         return response()->json([
             'Message' => 'Hotel data updated Successfully !!',
@@ -267,9 +282,7 @@ class UserController extends Controller
             $stripe = new \Stripe\StripeClient([
                 'api_key' => env('STRIPE_SECRET'),
             ]);
-            echo "<pre>";
-            print_r($stripe);
-            die;
+
             $token = $stripe->tokens->create([
                 'card' => [
                     'number' => $request->number,
@@ -299,23 +312,29 @@ class UserController extends Controller
             'room_name' => 'required',
             'bed_type' => 'required',
             'room_floor' => 'required',
-            'facility' => 'required',
+            'facility_id' => 'array',
         ]);
 
-        $rooms  = new Room;
-
-        $rooms['room_name'] = $request['room_name'];
-        $rooms['bed_type'] = $request['bed_type'];
-        $rooms['room_floor'] = $request['room_floor'];
-        $rooms['facility'] = $request['facility'];
-        $rooms['hotel_id'] = $request['hotel_id'];
-        $rooms->save();
+        $room = new Room;
+        $room->room_name = $request->input('room_name');
+        $room->bed_type = $request->input('bed_type');
+        $room->room_floor = $request->input('room_floor');
+        $room->hotel_id = $request->input('hotel_id');
+        $room->facility_id = $request->input('facility_id'); // Assign the array directly
+        $room->save();
 
         return response()->json([
-            'Message' => 'Rooms Save Successfully !!',
-            'Room' => $rooms,
+            'message' => 'Room saved successfully!',
+            'room' => $room,
         ]);
     }
+
+
+
+
+
+
+
 
     public function get_rooms()
     {
@@ -352,15 +371,21 @@ class UserController extends Controller
         ]);
     }
 
-    public function search_hotels(Request $request)
+    public function searchHotels(Request $request)
     {
-
         $search = $request->input('search'); // Get the search keyword from the request
+        $startDate = $request->input('start_date'); // Get the start date from the request
+        $endDate = $request->input('end_date'); // Get the end date from the request
 
-        $hotels = hotel::with('rooms')
+        $hotels = Hotel::with('rooms')
             ->where(function ($query) use ($search) {
                 $query->where('title', 'LIKE', "%$search%")
                     ->orWhere('location', 'LIKE', "%$search%");
+            })
+            ->whereHas('rooms', function ($query) use ($startDate, $endDate) {
+                // Apply date range filter on rooms
+                $query->whereDate('check_in_date', '>=', $startDate)
+                    ->whereDate('check_out_date', '<=', $endDate);
             })
             ->get();
 
@@ -403,5 +428,4 @@ class UserController extends Controller
             'user_data' => $book_hotel
         ]);
     }
-
 }
