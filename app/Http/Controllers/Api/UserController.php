@@ -320,7 +320,7 @@ class UserController extends Controller
         $room->bed_type = $request->input('bed_type');
         $room->room_floor = $request->input('room_floor');
         $room->hotel_id = $request->input('hotel_id');
-        $room->facility_id = $request->input('facility_id'); // Assign the array directly
+        $room->facility_id = $request->input('facility_id');
         $room->save();
 
         return response()->json([
@@ -328,12 +328,6 @@ class UserController extends Controller
             'room' => $room,
         ]);
     }
-
-
-
-
-
-
 
 
     public function get_rooms()
