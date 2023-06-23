@@ -14,7 +14,7 @@ use App\Http\Controllers\Api\UserController;
 |
 */
 
-// ------------------------------------Registe/Login--------------------------------------\\
+// ------------------------------------Register/Login--------------------------------------\\
 
 Route::post('register', [UserController::class, 'register']);
 
@@ -24,7 +24,7 @@ Route::post('login', [UserController::class, 'login']);
 
 Route::post('add-hotel', [UserController::class, 'add_hotel']);
 
-Route::get('get-hotels', [UserController::class, 'get_hotels']);
+Route::get('get-hotels', [UserController::class, 'getHotels']);
 
 Route::delete('delete-hotel/{id}', [UserController::class, 'delete_hotel']);
 
