@@ -40,7 +40,7 @@ Route::delete('delete-hotel_location/{id}', [UserController::class, 'delete_hote
 
 // ------------------------------------ROOMS------------------------------------------------\\
 
-Route::post('add-rooms', [UserController::class, 'add_room']);
+// Route::post('add-rooms', [UserController::class, 'add_room']);
 
 Route::get('get-rooms', [UserController::class, 'get_rooms']);
 
@@ -56,6 +56,8 @@ Route::get('search', [UserController::class, 'search_hotels']);
 // -----------------------------------Middeleware------------------------------------------\\
 
 Route::group(['middleware' => 'auth:api'], function () {
+  
+  Route::post('add-rooms', [UserController::class, 'add_room']);
 
   Route::post('user-details', [UserController::class, 'userDetails']);
 
